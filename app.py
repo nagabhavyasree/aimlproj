@@ -2,14 +2,16 @@ import streamlit as st
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
 
-# Load pre-trained tokenizer and model from Hugging Face
-model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # or use "bert-base-uncased"
-tokenizer = BertTokenizer.from_pretrained(model_name)
-model = BertForSequenceClassification.from_pretrained(model_name)
-
+# Load the tokenizer and model
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model.load_state_dict(torch.load("bert_model.pth", map_location=torch.device("cpu")))
 model.eval()
 
-# UI
+# Define the class labels (e.g., you can adjust them according to your use case)
+class_labels = ["False", "True"]  # Adjust this based on your model's classification labels
+
+# Streamlit UI
 st.title("Fake News Classifier")
 st.write("Enter a news statement, and we'll tell you whether it's likely **True** or **False**.")
 
@@ -23,8 +25,11 @@ if st.button("Classify"):
         with torch.no_grad():
             outputs = model(**inputs)
             probs = torch.nn.functional.softmax(outputs.logits, dim=1)
+            
+            # Print class probabilities and class labels
             st.write(f"Class probabilities: {probs.tolist()}")
-
+            st.write(f"Class labels: {class_labels}")
+            
             label = torch.argmax(probs, dim=1).item()
             confidence = probs[0][label].item()
 
@@ -32,6 +37,3 @@ if st.button("Classify"):
             st.success(f"🟢 Likely **TRUE** with confidence {confidence:.2f}")
         else:
             st.error(f"🔴 Likely **FALSE** with confidence {confidence:.2f}")
-
-
-
