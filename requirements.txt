@@ -1,3 +1,5 @@
 gdown
 transformers
 torch
+numpy
+scikit-learn
