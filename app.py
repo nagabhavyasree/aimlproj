@@ -1,11 +1,20 @@
 import streamlit as st
-from transformers import BertTokenizer, BertForSequenceClassification
+import gdown
 import torch
+from transformers import BertTokenizer, BertForSequenceClassification
 
-# Load the tokenizer and model dynamically from Hugging Face Hub
-model_name = "bert-base-uncased"  # Use your specific model name here
-tokenizer = BertTokenizer.from_pretrained(model_name)
-model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+# Google Drive file ID
+file_id = "your_file_id"  # Replace with your actual Google Drive file ID
+output = "bert_model.pth"
+
+# Download the model from Google Drive
+gdown.download(f"https://drive.google.com/uc?id={file_id}", output, quiet=False)
+
+# Load the tokenizer and model
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+model.load_state_dict(torch.load("bert_model.pth", map_location=torch.device("cpu")))
+model.eval()
 
 # Streamlit UI
 st.title("Fake News Classifier")
@@ -28,4 +37,5 @@ if st.button("Classify"):
             st.success(f"🟢 Likely **TRUE** with confidence {confidence:.2f}")
         else:
             st.error(f"🔴 Likely **FALSE** with confidence {confidence:.2f}")
+
 
