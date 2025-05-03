@@ -1,22 +1,15 @@
 import streamlit as st
-import gdown
-import torch
 from transformers import BertTokenizer, BertForSequenceClassification
+import torch
 
-# Google Drive file ID
-file_id = "your_file_id"  # Replace with your actual Google Drive file ID
-output = "bert_model.pth"
+# Load pre-trained tokenizer and model from Hugging Face
+model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # or use "bert-base-uncased"
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name)
 
-# Download the model from Google Drive
-gdown.download(f"https://drive.google.com/uc?id={file_id}", output, quiet=False)
-
-# Load the tokenizer and model
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-model.load_state_dict(torch.load("bert_model.pth", map_location=torch.device("cpu")))
 model.eval()
 
-# Streamlit UI
+# UI
 st.title("Fake News Classifier")
 st.write("Enter a news statement, and we'll tell you whether it's likely **True** or **False**.")
 
@@ -37,5 +30,6 @@ if st.button("Classify"):
             st.success(f"🟢 Likely **TRUE** with confidence {confidence:.2f}")
         else:
             st.error(f"🔴 Likely **FALSE** with confidence {confidence:.2f}")
+
 
 
