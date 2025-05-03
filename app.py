@@ -1,11 +1,20 @@
-import streamlit as st
-from transformers import BertTokenizer, BertForSequenceClassification
+import gdown
 import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+import streamlit as st
+
+# Download the model from Google Drive
+file_id = '1KAFrkjH2gI6c-AyF2-mAZ6yIBb1P0EqN'  # Replace with your actual file ID
+url = f'https://drive.google.com/uc?export=download&id={file_id}'
+output = 'bert_model.pth'
+
+# Download the file from Google Drive
+gdown.download(url, output, quiet=False)
 
 # Load the tokenizer and model
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-model.load_state_dict(torch.load("bert_model.pth", map_location=torch.device("cpu")))
+model.load_state_dict(torch.load(output, map_location=torch.device("cpu")))
 model.eval()
 
 # Define the class labels (e.g., you can adjust them according to your use case)
