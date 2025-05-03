@@ -2,11 +2,10 @@ import streamlit as st
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
 
-# Load tokenizer and model from saved files
-tokenizer = BertTokenizer.from_pretrained("./bert_tokenizer")
-model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-model.load_state_dict(torch.load("bert_model.pth", map_location=torch.device("cpu")))
-model.eval()
+# Load the tokenizer and model dynamically from Hugging Face Hub
+model_name = "bert-base-uncased"  # Use your specific model name here
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
 
 # Streamlit UI
 st.title("Fake News Classifier")
@@ -29,3 +28,4 @@ if st.button("Classify"):
             st.success(f"🟢 Likely **TRUE** with confidence {confidence:.2f}")
         else:
             st.error(f"🔴 Likely **FALSE** with confidence {confidence:.2f}")
+
